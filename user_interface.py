@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "http://127.0.0.1:5000"
+BASE_URL = "https://transcendantlight.onrender.com"
 
 def create_wallet():
     name = input("Enter your wallet name: ")
