@@ -59,7 +59,3 @@ def wallet_info():
             "transactions": wallet.transactions
         })
     return jsonify({"error": "Wallet not found."}), 404
-
-if __name__ == "__main__":
-    app.run(debug=True)
-    
