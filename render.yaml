@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: transcendantlight-server
+    name: Transcendantlight
     env: python
-    buildCommand: ""
+    buildCommand: "pip install -r requirments.txt"
     startCommand: "gunicorn server:app"
