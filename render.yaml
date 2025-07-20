@@ -3,4 +3,4 @@ services:
     name: transcendantlight-server
     env: python
     buildCommand: ""
-    startCommand: "python server.py"
+    startCommand: "gunicorn server:app"
