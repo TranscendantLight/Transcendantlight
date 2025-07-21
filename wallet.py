@@ -1,31 +1,24 @@
 from datetime import datetime
-
 class Wallet:
-    def __init__(self, name, balance=0):
+    def __init__(self, name, password):
         self.name = name
-        self.balance = balance
-        self.transactions = [(datetime.now(), 'created', self.balance)]
+        self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        self.balance = 0
         self.approved = False
+        self.transactions = [f"{datetime.now()}: Wallet '{name}' created"]
 
     def deposit(self, amount):
         if amount <= 0:
             return False
         self.balance += amount
-        self.transactions.append((datetime.now(), 'deposit', amount))
+        self.transactions.append(f"{datetime.now()}: Deposited {amount}")
         return True
 
-    def withdraw(self, amount):
-        if amount <= 0 or amount > self.balance:
+    def transfer(self, to_wallet, amount):
+        if not self.approved or not to_wallet.approved or amount > self.balance:
             return False
         self.balance -= amount
-        self.transactions.append((datetime.now(), 'withdraw', amount))
-        return True
-
-    def transfer(self, amount, recipient_wallet):
-        if amount <= 0 or amount > self.balance:
-            return False
-        self.withdraw(amount)
-        recipient_wallet.deposit(amount)
-        self.transactions.append((datetime.now(), f'transfer to {recipient_wallet.name}', amount))
-        recipient_wallet.transactions.append((datetime.now(), f'received from {self.name}', amount))
+        to_wallet.balance += amount
+        self.transactions.append(f"{datetime.now()}: Transferred {amount} to Wallet '{to_wallet.name}'")
+        to_wallet.transactions.append(f"{datetime.now()}: Received {amount} from Wallet '{self.name}'")
         return True
