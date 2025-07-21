@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import bcrypt
+import os
 from wallet import Wallet
 from admin import Admin
 from colours import Red, Green
@@ -7,7 +8,7 @@ from colours import Red, Green
 app = Flask(__name__)
 wallets = {}
 admin = Admin()
-hashed_admin_password = b'$2b$12$cPdfllSQjKxwLmmRRI2M1OuBlA5RKIhcVmcnZ.kO.oG.LFQOAn.M2'
+hashed_admin_password = os.environ.get('hashed_admin_password')
 
 @app.route('/admin_approve', methods=["POST"])
 def admin_approve():
