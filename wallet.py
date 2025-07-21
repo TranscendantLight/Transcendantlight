@@ -1,3 +1,4 @@
+import bcrypt
 from datetime import datetime
 class Wallet:
     def __init__(self, name, password):
