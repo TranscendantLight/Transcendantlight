@@ -1,9 +1,5 @@
 from flask import Flask, request, jsonify
-import bcrypt
-import os
-import threading
-import time
-import requests
+import bcrypt, requests, time, threading, os
 from wallet import Wallet
 from admin import Admin
 from colours import Red, Green
@@ -23,6 +19,10 @@ def ping():
         
 threading.Thread(target=ping, daemon=True).start()
         
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "online"})
+
 @app.route('/admin_approve', methods=["POST"])
 def admin_approve():
     password = request.json.get("password")
@@ -170,10 +170,6 @@ def destroy_wallet():
         del wallets[name]
         return jsonify({"message": f"Wallet '{name}' destroyed."})
     return jsonify({"error": "Wallet not found"}), 404
-
-@app.route("/health", methods=["GET"])
-def health():
-    return jsonify({"status": "online"})
 
 @app.route("/transfer", methods=["POST"])
 def transfer():
