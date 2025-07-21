@@ -2,18 +2,15 @@ import uuid
 
 class Admin:
     def __init__(self):
-        self.valid_codes = set()
+        self.valid_codes = {}  # code: amount
 
-    def approve_wallet(self, wallet):
-        wallet.approved = True
-
-    def generate_deposit_code(self):
+    def generate_deposit_code(self, amount):
         code = str(uuid.uuid4())
-        self.valid_codes.add(code)
+        self.valid_codes[code] = amount
         return code
 
     def is_valid_code(self, code):
-        if code in self.valid_codes:
-            self.valid_codes.remove(code)
-            return True
-        return False
+        return code in self.valid_codes
+
+    def get_code_amount(self, code):
+        return self.valid_codes.pop(code, None)
