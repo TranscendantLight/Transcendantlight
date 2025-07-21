@@ -171,6 +171,27 @@ def destroy_wallet():
         return jsonify({"message": f"Wallet '{name}' destroyed."})
     return jsonify({"error": "Wallet not found"}), 404
 
+@app.route("/destroy_all_wallets", methods=["POST"])
+def destroy_all_wallets():
+    password = request.json.get("password")
+    if not bcrypt.checkpw(password.encode(), hashed_admin_password):
+        return jsonify({"error": "Invalid admin password"}), 403
+    if wallets:
+        wallets.clear()
+        return jsonify({"message": "All wallets destroyed."})
+    return jsonify({"error": "No wallets to destroy"}), 404
+
+@app.route("/reset_server", methods=["POST"])
+def reset_server():
+    password = request.json.get("password")
+    if not bcrypt.checkpw(password.encode(), hashed_admin_password):
+        return jsonify({"error": "Invalid admin password"}), 403
+    if wallets and admin.valid_codes:
+        wallets.clear()
+        admin.valid_codes.clear()
+        return jsonify({"message": "Server reset successfully."})
+    return jsonify({"error": "No wallets or codes to reset"}), 404
+
 @app.route("/transfer", methods=["POST"])
 def transfer():
     sender_name = request.json.get("sender")
