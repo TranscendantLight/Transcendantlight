@@ -8,7 +8,7 @@ from colours import Red, Green
 app = Flask(__name__)
 wallets = {}
 admin = Admin()
-hashed_admin_password = os.environ.get('hashed_admin_password')
+hashed_admin_password = os.environ.get('hashed_admin_password').encode()
 
 @app.route('/admin_approve', methods=["POST"])
 def admin_approve():
