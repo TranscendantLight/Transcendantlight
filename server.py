@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify
 import bcrypt
 import os
+import threading
+import time
+import requests
 from wallet import Wallet
 from admin import Admin
 from colours import Red, Green
@@ -10,6 +13,16 @@ wallets = {}
 admin = Admin()
 hashed_admin_password = os.environ.get('hashed_admin_password').encode()
 
+def ping():
+    while True:
+        try:
+            requests.get("https://transcendantlight.onrender.com/health")
+        except:
+            pass
+        time.sleep(600)
+        
+threading.Thread(target=ping, daemon=True).start()
+        
 @app.route('/admin_approve', methods=["POST"])
 def admin_approve():
     password = request.json.get("password")
@@ -158,7 +171,6 @@ def destroy_wallet():
         return jsonify({"message": f"Wallet '{name}' destroyed."})
     return jsonify({"error": "Wallet not found"}), 404
 
-# Optional: Add a health check
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "online"})
