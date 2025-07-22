@@ -190,6 +190,12 @@ def reset_server():
         wallets.clear()
         admin.valid_codes.clear()
         return jsonify({"message": "Server reset successfully."})
+    elif not wallets and admin.valid_codes:
+        admin.valid_codes.clear()
+        return jsonify({"message": "Deposit codes cleared, no wallets to reset."})
+    elif wallets and not admin.valid_codes:
+        wallets.clear()
+        return jsonify({"message": "Wallets cleared, no deposit codes to reset."})
     return jsonify({"error": "No wallets or codes to reset"}), 404
 
 @app.route("/transfer", methods=["POST"])
