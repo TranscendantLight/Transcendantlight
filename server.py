@@ -195,6 +195,9 @@ def reset_server():
 @app.route("/transfer", methods=["POST"])
 def transfer():
     sender_name = request.json.get("sender")
+    sender_password = request.json.get("password")
+    if not bcrypt.checkpw(sender_password.encode(), wallets[sender_name].password):
+        return jsonify({"error": "Invalid password"}), 403
     receiver_name = request.json.get("receiver")
     amount = request.json.get("amount")
 
