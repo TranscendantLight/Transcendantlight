@@ -6,6 +6,7 @@ class Wallet:
         self.password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         self.balance = 0
         self.approved = False
+        self.locked = False
         self.transactions = [f"{datetime.now()}: Wallet '{name}' created"]
 
     def deposit(self, amount):
