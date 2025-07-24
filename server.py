@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import bcrypt, requests, time, threading, os
+import bcrypt, requests, time, threading
 from wallet import Wallet
 from admin import Admin
 from colours import Red, Green
@@ -7,18 +7,18 @@ from colours import Red, Green
 app = Flask(__name__)
 wallets = {}
 admin = Admin()
-hashed_admin_password = os.environ.get('hashed_admin_password').encode()
+hashed_admin_password = b'$2b$12$cPdfllSQjKxwLmmRRI2M1OuBlA5RKIhcVmcnZ.kO.oG.LFQOAn.M2'
 
 def ping():
     while True:
         try:
-            requests.get("https://transcendantlight.onrender.com/health")
+            requests.get("http://127.0.0.1:5000/health")
         except:
             pass
         time.sleep(600)
         
 threading.Thread(target=ping, daemon=True).start()
-        
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "online"})
@@ -94,8 +94,11 @@ def deposit():
     password = request.json.get("password")
     wallet = wallets.get(name)
     
+    if wallet.locked:
+        return jsonify({"error": "Wallet is locked. Contact an administrator for more details"}), 403
+    
     if not bcrypt.checkpw(password.encode(), wallet.password):
-        return jsonify({"error": "Invalid password"}), 403
+        return jsonify({"error": "Invalid password. Contact an administartor to reset your password."}), 403
     
     if wallet and wallet.approved and admin.is_valid_code(code):
         amount = admin.get_code_amount(code)
@@ -117,13 +120,15 @@ def wallet_info():
     password = request.json.get("password")
     wallet = wallets.get(name)
     if not bcrypt.checkpw(password.encode(), wallet.password):
-        return jsonify({"error": "Invalid password"}), 403
+        return jsonify({"error": "Invalid password. Contact an administartor to reset your password."}), 403
     if wallet:
         return jsonify({
             "name": wallet.name,
             "balance": wallet.balance,
             "approved": (Green(wallet.approved) if wallet.approved 
                          else Red(wallet.approved)),
+            "locked": (Red(wallet.locked) if wallet.locked 
+                       else Green(wallet.locked)),
             "transactions": wallet.transactions
         })
     return jsonify({"error": "Wallet not found"}), 404
@@ -141,6 +146,8 @@ def admin_wallet_info():
             "balance": wallet.balance,
             "approved": (Green(wallet.approved) if wallet.approved 
                          else Red(wallet.approved)),
+            "locked": (Red(wallet.locked) if wallet.locked 
+                       else Green(wallet.locked)),
             "transactions": wallet.transactions
         })
     return jsonify({"error": "Wallet not found"}), 404
@@ -156,6 +163,8 @@ def all_wallet_info():
             "balance": wallet.balance,
             "approved": (Green(wallet.approved) if wallet.approved 
                          else Red(wallet.approved)),
+            "locked": (Red(wallet.locked) if wallet.locked 
+                       else Green(wallet.locked)),
             "transactions": wallet.transactions
         } for wallet in wallets.values()])
     return jsonify({"error": "No wallets"}), 404
@@ -181,6 +190,30 @@ def destroy_all_wallets():
         return jsonify({"message": "All wallets destroyed."})
     return jsonify({"error": "No wallets to destroy"}), 404
 
+@app.route("/lock_wallet", methods=["POST"])
+def lock_wallet():
+    name = request.json.get("name")
+    password = request.json.get("password")
+    if not bcrypt.checkpw(password.encode(), hashed_admin_password):
+        return jsonify({"error": "Invalid admin password"}), 403
+    wallet = wallets.get(name)
+    if wallet:
+        wallet.locked = True
+        return jsonify({"message": f"Wallet '{name}' locked."})
+    return jsonify({"error": "Wallet not found"}), 404
+
+@app.route("/unlock_wallet", methods=["POST"])
+def unlock_wallet():
+    name = request.json.get("name")
+    password = request.json.get("password")
+    if not bcrypt.checkpw(password.encode(), hashed_admin_password):
+        return jsonify({"error": "Invalid admin password"}), 403
+    wallet = wallets.get(name)
+    if wallet:
+        wallet.locked = False
+        return jsonify({"message": f"Wallet '{name}' unlocked."})
+    return jsonify({"error": "Wallet not found"}), 404
+
 @app.route("/reset_server", methods=["POST"])
 def reset_server():
     password = request.json.get("password")
@@ -203,13 +236,16 @@ def transfer():
     sender_name = request.json.get("sender")
     sender_password = request.json.get("password")
     if not bcrypt.checkpw(sender_password.encode(), wallets[sender_name].password):
-        return jsonify({"error": "Invalid password"}), 403
+        return jsonify({"error": "Invalid password. Contact an administartor to reset your password."}), 403
     receiver_name = request.json.get("receiver")
     amount = request.json.get("amount")
 
     sender = wallets.get(sender_name)
     receiver = wallets.get(receiver_name)
 
+    if sender.locked or receiver.locked:
+        return jsonify({"error": "One or both wallets is locked. Contact an administrator for more details"}), 403
+    
     if not sender or not receiver:
         return jsonify({"error": "One or both wallets not found"}), 404
     if not sender.approved or not receiver.approved:
