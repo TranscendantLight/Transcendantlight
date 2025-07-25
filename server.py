@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import bcrypt, requests, time, threading
+import bcrypt, requests, time, threading, os
 from wallet import Wallet
 from admin import Admin
 from colours import Red, Green
@@ -7,16 +7,16 @@ from colours import Red, Green
 app = Flask(__name__)
 wallets = {}
 admin = Admin()
-hashed_admin_password = b'$2b$12$cPdfllSQjKxwLmmRRI2M1OuBlA5RKIhcVmcnZ.kO.oG.LFQOAn.M2'
+hashed_admin_password = os.environ.get('hashed_admin_password').encode()
 
 def ping():
     while True:
         try:
-            requests.get("http://127.0.0.1:5000/health")
+            requests.get("https://transcendantlight.onrender.com/health")
         except:
             pass
         time.sleep(600)
-        
+
 threading.Thread(target=ping, daemon=True).start()
 
 @app.route("/health", methods=["GET"])
