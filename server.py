@@ -4,7 +4,7 @@ from wallet import Wallet
 from admin import Admin
 from colours import Red, Green
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='web', static_url_path='/web')
 wallets = {}
 admin = Admin()
 hashed_admin_password = os.environ.get('hashed_admin_password').encode()
