@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import bcrypt, requests, time, threading, os
 from wallet import Wallet
 from admin import Admin
@@ -18,6 +18,10 @@ def ping():
         time.sleep(600)
 
 threading.Thread(target=ping, daemon=True).start()
+
+@app.route('/')
+def root():
+    return send_from_directory('web', 'index.html')
 
 @app.route("/health", methods=["GET"])
 def health():
