@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        @font-face{
+            font-family: 'Noto Sans';
+            src: url('/web/fonts/NotoSans.ttf') format('truetype');
+            font-weight: normal;
+        }
+        body{
+            margin: 0;
+            font-family: 'Noto Sans', sans-serif;
+        }
+        #main-menu{
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+	        height: 100%;
+	        justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        #banner{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            background-color: darkgray;
+            padding-inline: 0.5em;
+            margin-bottom: 0.5em;
+        }
+        .main-menu-container{
+            border: 0.25em solid lightgray;
+            border-radius: 1em;
+            margin-inline: 10px;
+            width: 20%;
+        }
+    </style>
+    <title>TranscendantLight User Menu</title>
+</head>
+<body>
+    <div id="banner">
+        <h1>TranscendantLight User Menu</h1>
+        <a>Admin?</a>
+    </div>
+    <div id="main-menu">
+        <div class="main-menu-container" id="wallet-menu">
+            <h2>Manage Your Wallet(s)</h2>
+            <img src="/web/images/wallet-icon.png" style="width: 80%;">
+        </div>
+        <div class="main-menu-container" id="deposit-menu">
+            <h2>Deposit</h2>
+            <img src="/web/images/deposit-icon.png" style="width: 80%;">
+        </div>
+        <div class="main-menu-container" id="buy-menu">
+            <h2>Buy</h2>
+            <img src="/web/images/buy-icon.png" style="width: 80%;">
+        </div>
+        <div class="main-menu-container" id="admin-contact-menu">
+            <h2>Contact an Administrator</h2>
+            <img src="/web/images/contact-icon.png" style="width: 80%;">
+        </div>
+    </div>
+</body>
+</html>
